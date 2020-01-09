@@ -12,12 +12,86 @@
     <!-- Added link to the jQuery Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
+    <!-- Add icon library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <!-- Custom or override css -->
     <link rel="stylesheet" href="./styles/font-imports.css" />
     <link rel="stylesheet" href="./styles/index.css" />
 </head>
 <body>
     
+    <div class="wrapper">
+        <!-- Sidebar Holder -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>Search a City</h3>
+            </div>
+
+            <ul class="list-unstyled components">
+                <form class="form-inline" id="searchCityForm">
+                    <div class="form-group mx-sm-3 mb-2">
+                      <label for="inputCity" class="sr-only">City</label>
+                      <input type="text" class="form-control" id="inputCity" placeholder="City name...">
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2" id="searchCityBttn"><i class="fa fa-search"></i></button>
+                </form>
+                <li>
+                    <a href="#">Portfolio</a>
+                </li>
+                <li>
+                    <a href="#">Contact</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Content Holder -->
+        <div id="content">
+
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+
+                    <button type="button" id="sidebarCollapse" class="navbar-btn">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+
+                    <h1 id="header-text">Weather Dashboard</h1>
+                </div>
+            </nav>
+            
+            <div class="container-fluid cityInfo d-flex flex-column">
+                <div class="d-flex flex-row align-items-center" id="cityTitleContainer">
+                    <h1 id="cityName">Atlanta (8/15/2019)</h1>
+                    <img id="weatherStatusIcon" alt="weather icon">
+                </div>
+
+                <p class="cityWeatherText" id="temperature">Temperature: 90.9 °F</p>
+                <p class="cityWeatherText" id="humidity">Humidity: 41%</p>
+                <p class="cityWeatherText" id="windSpeed">Wind Speed: 4.7 MPH</p>
+                
+                <div class="d-flex flex-row">
+                    <p class="cityWeatherText" id="uvLabel">UV Index:</p>
+                    <p class="cityWeatherText" id="uvValue">9.49</p>
+                </div>
+            </div>
+
+            <div class="container-fluid d-flex flex-column">
+                <h1 class="forecastTitle">5-day Forecast:</h1>
+
+                <div class="container-fluid d-inline-flex flex-row flex-wrap" id="forecastContainer">
+                    <div class="forecastCard d-flex flex-column justify-content-between">
+                        <h1 class="forecastDateTitle">8/16/2020</h1>
+                        <img class="forecastWeatherIcon" alt="weather icon">
+                        <p class="forecastText forecastTemp">Temp: 86.84 °F</p>
+                        <p class="forecastText forecastHumid">Humidity: 43%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Link JS file for index -->
     <script src="./scripts/index.js"></script>
 
