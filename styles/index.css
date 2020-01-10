@@ -6,6 +6,11 @@
     background-color: red;
 }
 
+.exampleText {
+    font-family: 'Montserrat';
+    font-size: 0.8em;
+}
+
 #uvLabel {
     margin-right: 5px;
 }

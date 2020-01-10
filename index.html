@@ -29,12 +29,15 @@
             </div>
 
             <ul class="list-unstyled components">
-                <form class="form-inline" id="searchCityForm">
-                    <div class="form-group mx-sm-3 mb-2">
-                      <label for="inputCity" class="sr-only">City</label>
-                      <input type="text" class="form-control" id="inputCity" placeholder="City name...">
+                <form class="form-inline d-flex flex-column justify-content-start align-items-start" id="searchCityForm">
+                    <div class="d-flex flex-row w-100 justify-content-between align-items-center">
+                        <div class="form-group mx-sm-3 flex-grow-1 align-items-center justify-content-center">
+                            <input type="text" class="d-flex flex-grow-1 form-control" id="inputCity" placeholder="City name, country code...">
+                        </div>
+                        <button type="submit" class="btn btn-primary m-0 mr-2" id="searchCityBttn"><i class="fa fa-search"></i></button>
                     </div>
-                    <button type="submit" class="btn btn-primary mb-2" id="searchCityBttn"><i class="fa fa-search"></i></button>
+                    <p class="m-0 p-0 ml-3 exampleText">Example: Hartford</p>
+                    <p class="m-0 p-0 ml-3 exampleText">Example: Hartford, US</p>
                 </form>
                 <li class="d-flex cityList">
                     <a class="d-flex w-100 flex-grow justify-content-between align-items-center"href="#">
