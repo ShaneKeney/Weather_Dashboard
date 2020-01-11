@@ -9,6 +9,8 @@ var iconUrlSuffix = '@2x.png';
 var unitsQuery = '&units=imperial';
 var uvIndexBaseUrl = `http://api.openweathermap.org/data/2.5/uvi?appid=85e68b224ff5d7b63d454f3ff7f9e09e`;
 
+var pastSearchHistory = []; //objects that will either be already in local storage or pushed to local
+
 $(document).ready(function () {
 
     //bind functionality to sidebar
@@ -29,7 +31,20 @@ $(document).ready(function () {
     });
 
     $(document).on("click", "#pastSearchBttn", deletePastSearch)
+
+    renderExistingToDos();
 });
+
+function renderExistingToDos() {
+    pastSearchHistory = JSON.parse(localStorage.getItem("searchHistory"));
+    pastSearchHistory.forEach((item) => {
+        let addCityToList = cityListElementTemplate.clone();
+        addCityToList.find("#cityListName").text(item.city);
+        addCityToList.find("#cityNameLink").attr("data-city", item.city);
+        addCityToList.find("#cityNameLink").attr("data-country", item.countryCode);
+        $(".list-unstyled").append(addCityToList);
+    });
+}
 
 function searchCity(cityName="", country="") {
     event.preventDefault();
@@ -63,11 +78,11 @@ function fiveDayWeatherRequest(urlBuilder) {
         url: urlBuilder,
         method: 'GET'
     }).then(function(response) {
-        renderfiveDayForecast(response);
+        renderFiveDayForecast(response);
     });
 }
 
-function renderfiveDayForecast(response) {
+function renderFiveDayForecast(response) {
     let addFiveDayContainer = fiveDayContainerTemplate.clone();
     addFiveDayContainer.find(".forecastCard").remove(); 
 
@@ -109,13 +124,13 @@ function currentWeatherRequest(urlBuilder, citySearch, countryCode) {
             renderCityWeatherInfo(response);
             renderUVIndex(uvResponse);
 
-            urlBuilder = `https://api.openweathermap.org/data/2.5/forecast?q=${citySearch}${countryCode}${unitsQuery}${apiKey}`
+            urlBuilder = `https://api.openweathermap.org/data/2.5/forecast?q=${citySearch}${countryCode}${unitsQuery}${apiKey}`;
             fiveDayWeatherRequest(urlBuilder);
         }).fail(function(uvResponse) {
             renderCityWeatherInfo(response);
             renderUVIndex(uvResponse);
 
-            urlBuilder = `https://api.openweathermap.org/data/2.5/forecast?q=${citySearch}${countryCode}${unitsQuery}${apiKey}`
+            urlBuilder = `https://api.openweathermap.org/data/2.5/forecast?q=${citySearch}${countryCode}${unitsQuery}${apiKey}`;
             fiveDayWeatherRequest(urlBuilder);
         });
     }).fail(function(xhr) {
@@ -137,7 +152,6 @@ function renderCityWeatherInfo(weatherData) {
 
     $("#content").append(currentCityForecast);
 
-    //TODO: Add all necessary info to a button for future pulling
     let addCityToList = cityListElementTemplate.clone();
     addCityToList.find("#cityListName").text(weatherData.name);
     addCityToList.find("#cityNameLink").attr("data-city", weatherData.name);
@@ -151,7 +165,18 @@ function renderCityWeatherInfo(weatherData) {
         }
     });
 
-    if(alreadyExists === false) $(".list-unstyled").append(addCityToList); //only append to list if the entry does not already exist
+    if(alreadyExists === false) {
+        $(".list-unstyled").append(addCityToList); //only append to list if the entry does not already exist  
+
+        let newSearch = { 
+            city: addCityToList.find("#cityNameLink").attr("data-city"),
+            countryCode: addCityToList.find("#cityNameLink").attr("data-country")
+        }
+
+        pastSearchHistory.push(newSearch);
+        localStorage.setItem("searchHistory", JSON.stringify(pastSearchHistory));
+    }
+
 }
 
 function renderUVIndex(uvResponse) {
@@ -177,7 +202,12 @@ function removeCurrentData() {
 
 function deletePastSearch(event) {
     event.stopPropagation();
-    $(this).parent().parent().remove();
 
-    //TODO: Local storage removal of necessary item
+    console.log($(this).parent().attr("data-city"));
+    console.log($(this).parent().attr("data-country"))
+
+    let newArray = pastSearchHistory.filter(item => ((item.city !== $(this).parent().attr("data-city")) || (item.countryCode !== $(this).parent().attr("data-country"))));
+    pastSearchHistory = newArray;
+    localStorage.setItem("searchHistory", JSON.stringify(pastSearchHistory));
+    $(this).parent().parent().remove();
 }
