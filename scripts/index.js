@@ -23,12 +23,26 @@ $(document).ready(function () {
     //remove on load placeholder templates
     removeCurrentData();
     $(".cityList").remove();
+
+    $(document).on("click", "a", function() { 
+        searchCity($(this).attr("data-city"), $(this).attr("data-country"));
+    });
+
+    $(document).on("click", "#pastSearchBttn", deletePastSearch)
 });
 
-function searchCity(event) {
+function searchCity(cityName="", country="") {
     event.preventDefault();
-    
-    let userInput = $("#inputCity").val().trim();
+    removeCurrentData();
+
+    let userInput;
+    //used for link clicks.  Only time passed in cityName and country will be used
+    if(cityName !== "" && country !== "") {
+        userInput = `${cityName}, ${country}`;
+    } else {
+        userInput = $("#inputCity").val().trim(); 
+    }
+
     if(userInput === '') return;
 
     let citySearch, countryCode;
@@ -41,12 +55,48 @@ function searchCity(event) {
     }
 
     let urlBuilder = `${weatherBaseUrl}${citySearch}${countryCode}${unitsQuery}${apiKey}`;
-    
+    currentWeatherRequest(urlBuilder, citySearch, countryCode);
+}
+
+function fiveDayWeatherRequest(urlBuilder) {
     $.ajax({
         url: urlBuilder,
         method: 'GET'
     }).then(function(response) {
-        console.log(response);
+        renderfiveDayForecast(response);
+    });
+}
+
+function renderfiveDayForecast(response) {
+    let addFiveDayContainer = fiveDayContainerTemplate.clone();
+    addFiveDayContainer.find(".forecastCard").remove(); 
+
+    let index = 4;
+    for(let i=0; i<5; i++) {
+        //grab desired templates and duplicate them
+        let addFiveDayCard = fiveDayContainerTemplate.find(".forecastCard").clone();
+
+        let dt = response.list[index].dt_txt;
+        let formattedDate = dt.substr(0, dt.indexOf(" "));
+
+        addFiveDayCard.find(".forecastDateTitle").text(formattedDate);
+        addFiveDayCard.find(".forecastTemp").text(`Temp: ${response.list[index].main.temp} °F`);
+        addFiveDayCard.find(".forecastHumid").text(`Humidity: ${response.list[index].main.humidity}%`);
+        addFiveDayCard.find(".forecastWeatherIcon").attr("src", `${iconUrlPrefix}${response.list[index].weather[0].icon}${iconUrlSuffix}`);
+        addFiveDayContainer.find("#forecastContainer").append(addFiveDayCard);
+
+        index+=8
+    }
+
+    $("#content").append(addFiveDayContainer);
+}
+
+function currentWeatherRequest(urlBuilder, citySearch, countryCode) {
+    $.ajax({
+        url: urlBuilder,
+        method: 'GET'
+    }).then(function(response) {
+        //console.log(response);
 
         let lat = response.coord.lat;
         let lon = response.coord.lon;
@@ -55,25 +105,26 @@ function searchCity(event) {
             url: `${uvIndexBaseUrl}&lat=${lat}&lon=${lon}`,
             method: 'GET'
         }).then(function(uvResponse) {
-            console.log(uvResponse);
+            //console.log(uvResponse);
             renderCityWeatherInfo(response);
             renderUVIndex(uvResponse);
+
+            urlBuilder = `https://api.openweathermap.org/data/2.5/forecast?q=${citySearch}${countryCode}${unitsQuery}${apiKey}`
+            fiveDayWeatherRequest(urlBuilder);
         }).fail(function(uvResponse) {
             renderCityWeatherInfo(response);
             renderUVIndex(uvResponse);
-        });
 
+            urlBuilder = `https://api.openweathermap.org/data/2.5/forecast?q=${citySearch}${countryCode}${unitsQuery}${apiKey}`
+            fiveDayWeatherRequest(urlBuilder);
+        });
     }).fail(function(xhr) {
         console.log('Error sending AJAX request!');
     });
-
-    //TODO: start next method call
-
 }
 
 function renderCityWeatherInfo(weatherData) {
-    removeCurrentData();
-
+    console.log(weatherData);
     let dt = moment();
     let currentDate = dt.format("MM/DD/YYYY");
 
@@ -87,7 +138,20 @@ function renderCityWeatherInfo(weatherData) {
     $("#content").append(currentCityForecast);
 
     //TODO: Add all necessary info to a button for future pulling
-    
+    let addCityToList = cityListElementTemplate.clone();
+    addCityToList.find("#cityListName").text(weatherData.name);
+    addCityToList.find("#cityNameLink").attr("data-city", weatherData.name);
+    addCityToList.find("#cityNameLink").attr("data-country", weatherData.sys.country);
+
+    let alreadyExists = false;
+    $('.list-unstyled').children('li').each(function () {
+        if($(this).find("#cityNameLink").attr("data-city") === weatherData.name) {
+            alreadyExists = true;
+            return;
+        }
+    });
+
+    if(alreadyExists === false) $(".list-unstyled").append(addCityToList); //only append to list if the entry does not already exist
 }
 
 function renderUVIndex(uvResponse) {
@@ -109,4 +173,11 @@ function renderUVIndex(uvResponse) {
 function removeCurrentData() {
     $(".cityInfo").remove();
     $("#fiveDayContainer").remove();
+}
+
+function deletePastSearch(event) {
+    event.stopPropagation();
+    $(this).parent().parent().remove();
+
+    //TODO: Local storage removal of necessary item
 }
