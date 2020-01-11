@@ -111,8 +111,6 @@ function currentWeatherRequest(urlBuilder, citySearch, countryCode) {
         url: urlBuilder,
         method: 'GET'
     }).then(function(response) {
-        //console.log(response);
-
         let lat = response.coord.lat;
         let lon = response.coord.lon;
 
@@ -120,7 +118,6 @@ function currentWeatherRequest(urlBuilder, citySearch, countryCode) {
             url: `${uvIndexBaseUrl}&lat=${lat}&lon=${lon}`,
             method: 'GET'
         }).then(function(uvResponse) {
-            //console.log(uvResponse);
             renderCityWeatherInfo(response);
             renderUVIndex(uvResponse);
 
@@ -139,7 +136,6 @@ function currentWeatherRequest(urlBuilder, citySearch, countryCode) {
 }
 
 function renderCityWeatherInfo(weatherData) {
-    console.log(weatherData);
     let dt = moment();
     let currentDate = dt.format("MM/DD/YYYY");
 
@@ -202,9 +198,6 @@ function removeCurrentData() {
 
 function deletePastSearch(event) {
     event.stopPropagation();
-
-    console.log($(this).parent().attr("data-city"));
-    console.log($(this).parent().attr("data-country"))
 
     let newArray = pastSearchHistory.filter(item => ((item.city !== $(this).parent().attr("data-city")) || (item.countryCode !== $(this).parent().attr("data-country"))));
     pastSearchHistory = newArray;
