@@ -2,12 +2,12 @@ var cityInfoContainerTemplate = $(".cityInfo").clone();
 var fiveDayContainerTemplate = $("#fiveDayContainer").clone();
 var cityListElementTemplate = $(".cityList").clone();
 
-var weatherBaseUrl = 'http://api.openweathermap.org/data/2.5/weather?q=';
+var weatherBaseUrl = 'https://api.openweathermap.org/data/2.5/weather?q=';
 var apiKey = '&appid=85e68b224ff5d7b63d454f3ff7f9e09e';
-var iconUrlPrefix = 'http://openweathermap.org/img/wn/';
+var iconUrlPrefix = 'https://openweathermap.org/img/wn/';
 var iconUrlSuffix = '@2x.png';
 var unitsQuery = '&units=imperial';
-var uvIndexBaseUrl = `http://api.openweathermap.org/data/2.5/uvi?appid=85e68b224ff5d7b63d454f3ff7f9e09e`;
+var uvIndexBaseUrl = `https://api.openweathermap.org/data/2.5/uvi?appid=85e68b224ff5d7b63d454f3ff7f9e09e`;
 
 var pastSearchHistory = []; //objects that will either be already in local storage or pushed to local
 
