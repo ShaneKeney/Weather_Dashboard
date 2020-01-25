@@ -36,14 +36,18 @@ $(document).ready(function () {
 });
 
 function renderExistingToDos() {
-    pastSearchHistory = JSON.parse(localStorage.getItem("searchHistory"));
-    pastSearchHistory.forEach((item) => {
-        let addCityToList = cityListElementTemplate.clone();
-        addCityToList.find("#cityListName").text(item.city);
-        addCityToList.find("#cityNameLink").attr("data-city", item.city);
-        addCityToList.find("#cityNameLink").attr("data-country", item.countryCode);
-        $(".list-unstyled").append(addCityToList);
-    });
+    try {
+        pastSearchHistory = JSON.parse(localStorage.getItem("searchHistory"));
+        pastSearchHistory.forEach((item) => {
+            let addCityToList = cityListElementTemplate.clone();
+            addCityToList.find("#cityListName").text(item.city);
+            addCityToList.find("#cityNameLink").attr("data-city", item.city);
+            addCityToList.find("#cityNameLink").attr("data-country", item.countryCode);
+            $(".list-unstyled").append(addCityToList);
+        });
+    } catch(err) {
+        pastSearchHistory = [];
+    }
 }
 
 function searchCity(cityName="", country="") {
@@ -124,9 +128,6 @@ function currentWeatherRequest(urlBuilder, citySearch, countryCode) {
             urlBuilder = `https://api.openweathermap.org/data/2.5/forecast?q=${citySearch}${countryCode}${unitsQuery}${apiKey}`;
             fiveDayWeatherRequest(urlBuilder);
         }).fail(function(uvResponse) {
-            renderCityWeatherInfo(response);
-            renderUVIndex(uvResponse);
-
             urlBuilder = `https://api.openweathermap.org/data/2.5/forecast?q=${citySearch}${countryCode}${unitsQuery}${apiKey}`;
             fiveDayWeatherRequest(urlBuilder);
         });
@@ -165,8 +166,8 @@ function renderCityWeatherInfo(weatherData) {
         $(".list-unstyled").append(addCityToList); //only append to list if the entry does not already exist  
 
         let newSearch = { 
-            city: addCityToList.find("#cityNameLink").attr("data-city"),
-            countryCode: addCityToList.find("#cityNameLink").attr("data-country")
+            city: weatherData.name, //addCityToList.find("#cityNameLink").attr("data-city"),
+            countryCode: weatherData.sys.country //addCityToList.find("#cityNameLink").attr("data-country")
         }
 
         pastSearchHistory.push(newSearch);
